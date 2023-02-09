@@ -15,7 +15,7 @@ void Task1(void* Paramter) {
 void Task2(void* Paramter) {
   for(;;) {
     Serial.println("Task2");
-    vTaskDelay(1000);
+    vTaskDelay(2000);
   }
 }
 

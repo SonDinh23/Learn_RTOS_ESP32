@@ -1,0 +1,123 @@
+***     Các thao tác với tác vụ trong FreeRTOS
+    1.  Tạo tác vụ mới
+    2.  Thay đổi mức ưu tiên của tác vụ
+    3.  Đình chỉ tác vụ
+    4.  Phục hồi tác vụ bị đình chỉ
+    5.  Xóa tác vụ
+
+1.  TẠO TÁC VỤ mới
+    
+    Với FreeRTOS: Các tác vụ đươc khởi tạo sử dụng hàm API
+
+        xTaskCreate(),
+        xTaskCreatePinnedToCore(),...
+
+*** Nuyên mẫu hàm API xTaskCreate():
+==> BaseType_t xTaskCreate(
+                TaskFuntion_t task_Funtion,
+                const char* task_name,
+                uint16_t stack_depth,
+                UBaseType_t priority,
+                TaskHandle_t *taskHandler
+            );
+    Return:
+    +   pdPASS - task được tạo thành công
+    +   pdFAIL - task không được tạo do thiếu bộ nhớ heap
+
+Trong đó:
+    -   task_Funtion: Con trỏ đến task Funtion được dùng để tạo task mới;
+    
+    -   task_name: Con trỏ đến string chứa tên của task. Kích thước tối đa của task name 
+            được quy định trong hằng số ConfigMAX_TASK_NAME_LEN (trong file config của FreeRTOS)
+
+    -   stack_depth: Độ lớn của stack được cấp phát cho task, Idle task sử dụng stack_depth được quy định
+            bởi hằng số ConfigMINIMAL_STACK_SIZE và stack_depth của task tạo ra phải lớn hơn giá trị này.
+    
+    -   param: Con trỏ đến đối sô được truyền cho task, kiểu pointer to void
+
+    -   priority: Mức độ ưu tiên của task được tạo, với 0 là mức thấp nhất(của Idle task), max là ConfigMAX_PRIORITIES -1
+
+    -   task_handler: Con trỏ đến task sẽ được tạo, được dùng để truyền vào các API như vTaskDelete(), vTaskPriority(). Có thể truyền vào NULL nếu không sử dụng.
+===> Mặc định là core 1 khi chạy trên Arduino IDE
+
+
+*** Nguyên mẫu hàm API xTaskCreatePinnedToCore()
+==> BaseType_t xTaskCreatePinnedToCore(
+            TaskFuntion_t pvTaskCode,
+            const char* const pcName,
+            void* const pvParameters,
+            UBaseType_t* uxPutor,
+            TaskHandle_t* const pvCreateTask,
+            const BaseType_t x
+        );
+    Return
+        pdPASS: nếu tác vụ đã được tạo thành công và được thêm vào danh sách ready
+                nếu không thì một mã lỗi được xác định trong tệp projdefs.h
+
+Thông số:
+
+    -   pvTaskCode: Con trỏ đến chức năng nhập nhiệm vụ. Các tác vụ phải được thực hiện để không bao giờ quay trở lại (tức là vòng lặp liên tục) hoặc phải được kết thúc bằng 
+            cách sử dụng hàm vTaskDelete.
+    
+    -   pcName: Tên mô tả cho nhiệm vụ. Điều này chủ yếu được sử dụng để tạo điều kiện gỡ lỗi.
+            Độ dài tối đa do ConfigMAX_TASK_NAME_LEN quyết định - mặc định là 16
+    
+    -   usStackDepth: Kích thươc của ngăn xếp tác vụ được chỉ đinh bằng số byte. Lưu ý rằng điều này khác với FreeRTOS vani
+
+    -   usPriority: Mức độ ưu tiên mà tác vụ sẽ chạy. Các hệ thống bao gồm hỗ trợ MPU có thể tùy chọn tạo các tác vụ 
+            ở chế độ (hệ thống) đặc quyền bằng cách đặt cổng bitPRIVILEGE_BIT của tham số ưu tiên. Ví dụ: để tạo một tác vụ đặc quyền ở mức độ ưu tiên 2, tham số uxPionary phải được đặt thành (2/portPRIVILEGE_BIT)
+    
+    -   xCoreID: Nếu giá trị tskNO_AFFINITY, tác vụ đã tạo sẽ không được ghim vào bất kỳ CPU nào và scheduler có thể chạy nó trên bất kỳ lõi nào có sẵn. Giá trị 0
+            hoặc 1 cho biết số chỉ mục của CPU mà tác vụ sẽ được ghim vào. Việc chỉ định các giá trị lớn hơn(portNUM_PROCESSORS-1) sẽ khiến hàm không thành công
+
+===> Có thể điều chỉnh được xCoreID
+
+2.  Thay đổi mức ưu tiên của tác vụ 
+
+    -   Mức ưu tiên có thể được thay đổi bởi một sự kiện (event)
+            bên ngoài hoặc bởi một tác vụ đang chạy
+    
+    -   Trong FreeRTOS, sử dụng các hàm chức năng sau để thay đổi
+            mức ưu tiên của một tác vụ:
+
+            + Hàm API vTaskPrioritySet(): Thay đổi mức ưu tiên
+            + Hàm API uxTaskPriorityGet(): Lấy giá trị mưu tiên 
+
+*** Nguyên mẫu hàm API vTaskPrioritySet():
+
+    void vTaskPrioritySet(TaskHandle_t Task_handler, UBaseType_t new_priority);
+
+*** Nguyên mẫu hàm API uxTaskPriorityGet():
+
+    void uxTaskPriorityGet(TaskHandle_t Task_handler);
+
+3. Đình chỉ tác vụ
+
+    FreeRTOS sử dụng hàm API vTaskSuppend() để đình chỉ một tác vụ.
+
+    -   INCLUDE_vTaskSuppend phải được định nghĩa là 1 để chức năng này khả dụng
+    -   Nguyên mẫu API vTaskSuppend():
+            void vTaskSuppend(TaskHandle_t xTaskToSuspend);
+
+    Trong đó xTaskToSuspend là tham số Task_handler của hàm API xTaskCreate() khi tạo tác vụ muốn đình chỉ.
+    Truyền là NULL nếu tác vụ gọi API muốn tự đình chỉ nó.
+
+4. Phục hồi tác vụ bị đình chỉ
+
+    Một tác vụ đã bị đình chỉ bởi một hoặc nhiều lần gọi đến hàm API vTaskSuppend() sẽ được chạy lại
+        bằng một lần gọi đến hàm API vTaskResume()
+    
+    -   INCLUDE_vTaskResume phải được định nghĩ là 1 để chức năng này khả dụng
+    -   Nguyên mẫu hàm vTaskResume():
+            void vTaskResume(TaskHandle_t xTaskToResume);
+    
+    Trong đó xTaskToResume là tham số Task_handler của hàm API xTaskCreate() khi tạo tác vụ muốn khôi phục
+
+5. Xóa tác vụ
+
+    Một tác vụ có thể sử dụng hàm API vTaskDelete() để xóa chính nó hoặc bất kỳ tác vụ khác
+
+    -   Các tác vụ đã xóa không còn tồn tại và không thể nhập vào trạng thái "Running" nữa
+    -   Đó là trách nhiệm của tác vụ nhàn rỗi(Idle) để giải phóng toàn bộ nhờ đã cấp phát cho các tác vụ bị xóa
+    -   Nguyễn mẫu của hàm API vTaskDelete();
+                void vTaskDelete(xTaskHandle xTaskToDelete);
