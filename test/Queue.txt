@@ -1,0 +1,23 @@
+                                            QUẢN LÝ HÀNG ĐỢI (QUEUE)
+1.  Tổng quan 
+    1. Hàng đợi trong FreeRtos
+        +   Hàng đợi là nơi lưu trữ dữ liệu của các Task
+        +   Không gian hàng đợi có giới hạn và do người dùng định nghĩa
+        +   Hàng đợi hoạt động theo nguyên tắc FIFO (First In First Out - Vào trước ra trước)
+    
+    2.  Các đặc điểm của hàng đợi(QUEUE)
+        +   Một hàng đợi có thể chưa một số lượng hữu hạn các phần tử được khai báo 
+        +   Số lượng tối đa phần tử mà một hàng đợi chứa được gọi là độ dài của hàng đợi
+        +   Thông thường các hàng đợi được dùng như bộ nhớ First In First Out (FIFO) nơi
+                mà dữ liệu được ghi vào cuối hàng đợi và lấy ra ở đầu hàng đợi
+        +   Hàng đợi không được sở hữu bởi một tác vụ cụ thể nào cả mà được truy cập từ nhiều tác
+                vụ (Task)
+        +   Thông thường một hàng đợi được ghi từ nhiều tác vụ, và được đọc ở một số tác vụ nào đấy
+        +   Bất kỳ số lượng tác vụ nào cũng có thể ghi vào cùng 1 hàng đợi và bất kỳ sô tác vụ nào 
+                có thể đọc từ cùng 1 hàng đợi
+        +   Lưu trữ dữ liệu 
+        +   Truy cập bởi nhiều tác vụ
+        +   Khóa quyền đọc hàng đợi
+        +   Khóa quyền ghi hàng đợi
+    
+    3.  

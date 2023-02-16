@@ -1,8 +1,9 @@
 #ifndef LIB_PROJECT_1
 #define LIB_PROJECT_1
 
-#include <LibOledI2c.h>
-#include <LibEsp32Servo.h>
+#include "LibOledI2c.h"
+#include <ESP32Servo.h>
+//#include <LibEsp32Servo.h>
 
 #include "RTClib.h"
 
@@ -13,14 +14,30 @@
 #define INSOLE_1 18
 #define INSOLE_2 19
 
+/*
+    ANGLE one Insole
+    ANGLEMAX 98
+    ANGLEMIN 60
+    ANGLETB 77
+*/ 
+
+// ANGLE many Insole
+#define ANGLEMAX 103   // Trai
+#define ANGLEMIN 65   // Phai
+#define ANGLETB 83
+#define SPEED 4
+
+#define SERVO 4
+
 class LibProject_1
 {
 private:
     /* data */
    
     LibOledI2c libolei2c;
-    LibEsp32Servo libesp32servo;
+    //LibEsp32Servo libesp32servo;
     RTC_DS1307 rtc;
+    Servo myservo;
 
     uint8_t stateTG = 1;
 
@@ -61,7 +78,33 @@ private:
     
 public:
     uint8_t stateMH = 0;
+    uint16_t data = 0;
+
+    uint16_t count1 = 0;
+    uint16_t dem1 = 0;
+    uint16_t dem2 = 0;
+
+    uint8_t stateStart2 = 0;
+    uint8_t statePause2 = 0;
+    uint8_t stateStop2 = 0;
+
+    uint8_t stateStart1 = 0;
+    uint8_t statePause1 = 0;
+    uint8_t stateStop1 = 0;
+
+    uint16_t tempRun = 0;
+    uint16_t ul = 0;
+
+    uint16_t countInsole_1_2 = 0;
+    uint16_t countInsole_2_2 = 0;
+    
+    uint16_t countInsole_1_1 = 0;
+    uint16_t countInsole_2_1 = 0;
+
     LibProject_1(/* args */);
+
+    void setServo();
+    void setServoTB();
 
     //print many screen
     void screenIntro();
