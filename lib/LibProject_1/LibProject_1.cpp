@@ -10,6 +10,8 @@ void LibProject_1::begin() {
     pinMode(DT, INPUT);
     pinMode(SW, INPUT_PULLUP);
 
+    myservo.attach(SERVO);
+
     pinMode(INSOLE_1, INPUT_PULLUP);
     pinMode(INSOLE_2, INPUT_PULLUP);
     rtc.begin();
@@ -285,12 +287,18 @@ void LibProject_1::screenTest1() {
         
         updateEncoder();
 
+        // if(updateEncoder() == 1 || updateEncoder() == 2) {
+        //     if (counter < 0) counter = 0;
+        //     count1 = counter * 100;
+        //     data = count1;
+        // }else{
+        //     count1 = countT;
+        // }
         if (counter < 0) counter = 0;
         count1 = counter * 100;
-
         libolei2c.printTargetset(count1);
-
         data = count1;
+        
 
         while (digitalRead(SW) == 0) {
             if(millis() - lastTimeF > 80) {
@@ -311,11 +319,12 @@ void LibProject_1::screenTest1() {
 
         if ((stateStartTest1 >= 1) && (stateStartTest1 < 5)) {
             //Serial.println("alo");
-            stateStart1 = 0;
+            // stateStart1 = 0;
             stateStartTest1 = 0;
         
             dem1 = 0;
             for (int i = 0; i < data; i++) {
+                stateStart1 = 0;
                 now = rtc.now();
                 printRtcNow(now.month(), now.day(), now.hour(), now.minute());
 
@@ -386,6 +395,7 @@ void LibProject_1::screenTest1() {
                 }
                 if(statePause1 == 1) {
                     statePauseTest1 = 1;
+                    //break;
                 }
 
                 while (digitalRead(SW) == 0) {

@@ -9,8 +9,8 @@
 #include "LibProject_1.h"
 
 
-const char* WIFI_SSID = "iPhone của Sơn";
-const char* WIFI_PASSWORD = "esp32rtos";
+const char* WIFI_SSID = "Vulcan Augmetics";
+const char* WIFI_PASSWORD = "wearevulcan.com";
 
 #define FIREBASE_HOST "exampletest-a2b25-default-rtdb.firebaseio.com"
 #define FIREBASE_AUTH "8IYQWktZVOLIVFN0cI4Lbu62DyWdAyPoqRdjlVDf"
@@ -67,8 +67,31 @@ void task_Option(void* Parameters) {
     }
 }
 
+uint32_t lastTimeM = millis();
+uint32_t lastTimeN = millis();
+uint32_t lastTimeP = millis();
 void task_Data_Firebase(void* Paramters) {
     for(;;) {
+
+        //get data control from firebase
+        libproject_1.stateStart1 = (libwifi.getStrdata("/btnStart1")).toInt();
+        libproject_1.statePause1 = (libwifi.getStrdata("/btnPause1")).toInt();
+        libproject_1.stateStop1 = (libwifi.getStrdata("/btnStop1")).toInt();
+
+        libproject_1.stateStart2 = (libwifi.getStrdata("/btnStart2")).toInt();
+        libproject_1.statePause2 = (libwifi.getStrdata("/btnPause2")).toInt();
+        libproject_1.stateStop2 = (libwifi.getStrdata("/btnStop2")).toInt();
+                
+        // set data control to firebase
+        
+        libwifi.sendStrdata("/btnStart2", String(libproject_1.stateStart2));
+        libwifi.sendStrdata("/btnPause2", String(libproject_1.statePause2));
+        libwifi.sendStrdata("/btnStop2", String(libproject_1.stateStop2));
+
+        libwifi.sendStrdata("/btnStart1", String(libproject_1.stateStart1));
+        libwifi.sendStrdata("/btnPause1", String(libproject_1.statePause1));
+        libwifi.sendStrdata("/btnStop1", String(libproject_1.stateStop1));
+
         //set data test 1 to firebase
         libwifi.sendIntdata("/data1", libproject_1.count1);
         libwifi.sendIntdata("/datacount1R", libproject_1.countInsole_1_1);
@@ -89,24 +112,9 @@ void task_Data_Firebase(void* Paramters) {
         libwifi.sendIntdata("/datacount2L", libproject_1.countInsole_2_2);
 
 
-        //get data control from firebase
-        libproject_1.stateStart1 = (libwifi.getStrdata("/btnStart1")).toInt();
-        libproject_1.statePause1 = (libwifi.getStrdata("/btnPause1")).toInt();
-        libproject_1.stateStop1 = (libwifi.getStrdata("/btnStop1")).toInt();
+        //libproject_1.countT = (libwifi.getStrdata("/data1")).toInt();
 
-        libproject_1.stateStart2 = (libwifi.getStrdata("/btnStart2")).toInt();
-        libproject_1.statePause2 = (libwifi.getStrdata("/btnPause2")).toInt();
-        libproject_1.stateStop2 = (libwifi.getStrdata("/btnStop2")).toInt();
-                
-        // set data control to firebase
         
-        libwifi.sendStrdata("/btnStart2", String(libproject_1.stateStart2));
-        libwifi.sendStrdata("/btnPause2", String(libproject_1.statePause2));
-        libwifi.sendStrdata("/btnStop2", String(libproject_1.stateStop2));
-
-        libwifi.sendStrdata("/btnStart1", String(libproject_1.stateStart1));
-        libwifi.sendStrdata("/btnPause1", String(libproject_1.statePause1));
-        libwifi.sendStrdata("/btnStop1", String(libproject_1.stateStop1));
     }
 }
 
@@ -122,7 +130,7 @@ void setup() {
     libproject_1.begin();
     libproject_1.screenIntro();
     // Serial.println("Oke");
-    xTaskCreatePinnedToCore(task_Data_Firebase, "task_Data", 15000, NULL, 1, &task_data_firebase, 1);
+    xTaskCreatePinnedToCore(task_Data_Firebase, "task_Data", 15000, NULL, 3, &task_data_firebase, 1);
     xTaskCreatePinnedToCore(task_Option, "task_Option", 5000, NULL, 1, &task_option, 0);
     
 

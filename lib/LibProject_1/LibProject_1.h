@@ -22,10 +22,10 @@
 */ 
 
 // ANGLE many Insole
-#define ANGLEMAX 103   // Trai
+#define ANGLEMAX 105   // Trai
 #define ANGLEMIN 65   // Phai
-#define ANGLETB 83
-#define SPEED 4
+#define ANGLETB 87
+#define SPEED 8
 
 #define SERVO 4
 
@@ -80,6 +80,7 @@ public:
     uint8_t stateMH = 0;
     uint16_t data = 0;
 
+    uint16_t countT = 0;
     uint16_t count1 = 0;
     uint16_t dem1 = 0;
     uint16_t dem2 = 0;
