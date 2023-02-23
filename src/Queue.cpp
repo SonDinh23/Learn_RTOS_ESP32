@@ -1,33 +1,49 @@
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
 
-TaskHandle_t Task1;
-TaskHandle_t Task2;
-TaskHandle_t Task3;
-TaskHandle_t Task4;
-
-void Task1(void* Parameters) {
-
+#define Threshold 40 
+touch_pad_t touchPin;
+void Task1(void* pvParameters);
+void Task2(void* pvParameters);
+void callback(){
+  //placeholder callback function
+}
+void Task1(void* Paramter) {
+  //for(;;) {
+    Serial.println("Task1");
+    //vTaskDelay(1000);
+  //}
 }
 
-void Task2(void* Parameters) {
+void Task2(void* Paramter) {
+  //for(;;) {
+    Serial.println("Task2");
+    Serial.println("Going to sleep now");
+  esp_deep_sleep_start();
+  Serial.println("This will never be printed");
+    //vTaskDelay(2000);
 
-}
-
-void Task3(void* Parameters) {
-
-}
-
-void Task4(void* Parameters) {
-
+  //}
 }
 
 void setup() {
-    Serial.begin(115200);
-    Serial.println("ok");
-    xTaskCreatePinnedToCore(Task1,"Task1",128,);
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  touchAttachInterrupt(T3, callback, Threshold);
+  xTaskCreatePinnedToCore(Task1,"Task1",1024,NULL,1,NULL,0);
+  xTaskCreatePinnedToCore(Task2,"Task2",10000,NULL,1,NULL,1);
+  
 
+//   Configure Touchpad as wakeup source
+  esp_sleep_enable_touchpad_wakeup();
+
+  //Go to sleep now
+//   Serial.println("Going to sleep now");
+//   esp_deep_sleep_start();
+//   Serial.println("This will never be printed");
 }
-void loop() {
 
+void loop() {
+  // put your main code here, to run repeatedly:
+  vTaskDelete(NULL);
 }
