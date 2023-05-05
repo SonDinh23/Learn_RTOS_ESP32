@@ -16,18 +16,19 @@ public:
     LibWiFi(/* args */);
     void setupWiFi(const char* WIFI_SSID, const char* WIFI_PASSWORD);
     void setupFB(String FIREBASE_HOST, String FIREBASE_AUTH);
-    
+    bool checkConnect();
+
     // send data to firebase
     void sendStrdata(String keyFB, String data);
     void sendIntdata(String keyFB, int data);
     void sendFloatdata(String keyFB, float data);
 
+    // String tryCatch();
+
     // give data to firebase
     int32_t getIntdata(String keyFB);
     String getStrdata(String keyFB);
     float_t getFloatdata(String keyFB);
-
-    
 };
 
 // LibWiFi::LibWiFi(/* args */)
